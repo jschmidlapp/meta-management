@@ -1,0 +1,11 @@
+--- collectd-5.1.0.orig/configure.in	2012-07-28 22:37:34.327293188 -0400
++++ collectd-5.1.0/configure.in	2012-07-28 22:39:10.975290333 -0400
+@@ -4,6 +4,8 @@
+ AC_CONFIG_HEADERS(src/config.h)
+ AC_CONFIG_AUX_DIR([libltdl/config])
+ 
++AC_DEFUN([AM_PATH_LIBGCRYPT],[:])
++
+ m4_ifdef([LT_PACKAGE_VERSION],
+ 	# libtool >= 2.2
+ 	[

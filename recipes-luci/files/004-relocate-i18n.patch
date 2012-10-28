@@ -1,0 +1,49 @@
+--- git.orig/Makefile	2012-08-05 21:53:01.686718064 -0400
++++ git/Makefile	2012-08-05 21:56:59.682711033 -0400
+@@ -29,8 +29,8 @@
+ 		SDK="$(shell test -f .running-sdk && echo 1)" make -C$$i luabuild; done
+ 
+ i18nbuild:
+-	mkdir -p $(HOST)/lua-po
+-	./build/i18n-po2lua.pl ./po $(HOST)/lua-po
++	mkdir -p $(HOST)/usr/share/locale
++	./build/i18n-po2lua.pl ./po $(HOST)/usr/share/locale $(I18N_MODULE)
+ 
+ clean:
+ 	rm -f .running-sdk
+--- git.orig/build/i18n-po2lua.pl	2012-08-05 21:53:20.458717511 -0400
++++ git/build/i18n-po2lua.pl	2012-08-05 21:50:36.866722344 -0400
+@@ -1,9 +1,10 @@
+ #!/usr/bin/perl
+ 
+-@ARGV == 2 || die "Usage: $0 <source-dir> <dest-dir>\n";
++@ARGV == 2 || @ARGV == 3 || die "Usage: $0 <source-dir> <dest-dir> [module-name]\n";
+ 
+ my $source_dir  = shift @ARGV;
+ my $target_dir  = shift @ARGV;
++my $modname     = shift @ARGV;
+ 
+ if( ! -d $target_dir )
+ {
+@@ -14,13 +15,18 @@
+ {
+ 	while( chomp( my $file = readline F ) )
+ 	{
+-		my ( $lang, $basename ) = $file =~ m{.+/(\w+)/([^/]+)\.po$};
++	    my ( $lang, $basename ) = $file =~ m{.+/(\w+)/([^/]+)\.po$};
++
++	    if (!$modname || ($modname eq $basename))
++	    {
+ 		$lang = lc $lang;
+ 		$lang =~ s/_/-/g;
+ 
+-		printf "Generating %-40s ", "$target_dir/$basename.$lang.lmo";
+-		system("./build/po2lmo", $file, "$target_dir/$basename.$lang.lmo");
++		printf "Generating %-40s ", "$target_dir/$lang/$basename.lmo";
++		system("mkdir","-p","$target_dir/$lang");
++		system("./build/po2lmo", $file, "$target_dir/$lang/$basename.lmo");
+ 		print ( -f "$target_dir/$basename.$lang.lmo" ? "done\n" : "empty\n" );
++	    }
+ 	}
+ 
+ 	close F;

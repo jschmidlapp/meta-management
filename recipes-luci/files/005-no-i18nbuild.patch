@@ -1,0 +1,11 @@
+--- ./Makefile.orig	2012-08-06 00:21:00.158455735 -0400
++++ ./Makefile	2012-08-06 00:21:17.210455232 -0400
+@@ -24,7 +24,7 @@
+ 		}; \
+ 	done
+ 
+-luabuild: i18nbuild
++luabuild: 
+ 	for i in $(MODULES); do \
+ 		SDK="$(shell test -f .running-sdk && echo 1)" make -C$$i luabuild; done
+ 

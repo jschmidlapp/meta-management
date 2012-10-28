@@ -1,0 +1,91 @@
+--- git.orig/Makefile	2012-08-02 00:00:16.764815533 -0400
++++ git/Makefile	2012-08-01 23:59:54.876816179 -0400
+@@ -2,6 +2,8 @@
+ 
+ MODULES ?= contrib/* applications/* libs/* modules/* themes/* i18n/*
+ 
++HOST ?= $(realpath "host")
++
+ OS:=$(shell uname)
+ MODULES:=$(foreach item,$(wildcard $(MODULES)),$(if $(realpath $(wildcard $(item)/Makefile)),$(item)))
+ 
+@@ -23,12 +25,12 @@
+ 	done
+ 
+ luabuild: 
+-	for i in $(MODULES); do HOST=$(realpath host) \
++	for i in $(MODULES); do \
+ 		SDK="$(shell test -f .running-sdk && echo 1)" make -C$$i luabuild; done
+ 
+ i18nbuild:
+-	mkdir -p host/lua-po
+-	./build/i18n-po2lua.pl ./po host/lua-po
++	mkdir -p $(HOST)/lua-po
++	./build/i18n-po2lua.pl ./po $(HOST)/lua-po
+ 
+ clean:
+ 	rm -f .running-sdk
+@@ -44,12 +46,12 @@
+ luahost: luabuild hostcopy
+ 
+ hostcopy: 
+-	mkdir -p host/tmp
+-	mkdir -p host/var/state
+-	for i in $(MODULES); do cp -pR $$i/dist/* host/ 2>/dev/null || true; done
+-	for i in $(MODULES); do cp -pR $$i/hostfiles/* host/ 2>/dev/null || true; done
+-	rm -f host/luci
+-	ln -s .$(LUCI_MODULEDIR) host/luci
++	mkdir -p $(HOST)/tmp
++	mkdir -p $(HOST)/var/state
++	for i in $(MODULES); do cp -pR $$i/dist/* $(HOST)/ 2>/dev/null || true; done
++	for i in $(MODULES); do cp -pR $$i/hostfiles/* $(HOST)/ 2>/dev/null || true; done
++	rm -f $(HOST)/luci
++	ln -s .$(LUCI_MODULEDIR) $(HOST)/luci
+ 	rm -rf /tmp/luci-* || true
+ 
+ hostenv: sdk host ucidefaults
+@@ -58,34 +60,34 @@
+ 	touch .running-sdk
+ 
+ ucidefaults:
+-	build/hostenv.sh $(realpath host) $(LUA_MODULEDIR) $(LUA_LIBRARYDIR) "$(realpath host)/bin/uci-defaults --exclude luci-freifunk-*"
++	build/hostenv.sh $(HOST) $(LUA_MODULEDIR) $(LUA_LIBRARYDIR) "$(HOST)/bin/uci-defaults --exclude luci-freifunk-*"
+ 
+ runhttpd: hostenv
+-	build/hostenv.sh $(realpath host) $(LUA_MODULEDIR) $(LUA_LIBRARYDIR) "lua build/lucid.lua"
++	build/hostenv.sh $(HOST) $(LUA_MODULEDIR) $(LUA_LIBRARYDIR) "lua build/lucid.lua"
+ 
+ runuhttpd: hostenv
+-	cp $(realpath build)/luci.cgi $(realpath host)/www/cgi-bin/luci
+-	build/hostenv.sh $(realpath host) $(LUA_MODULEDIR) $(LUA_LIBRARYDIR) "$(realpath host)/usr/sbin/uhttpd -p 8080 -h $(realpath host)/www -f"
++	cp $(realpath build)/luci.cgi $(HOST)/www/cgi-bin/luci
++	build/hostenv.sh $(HOST) $(LUA_MODULEDIR) $(LUA_LIBRARYDIR) "$(HOST)/usr/sbin/uhttpd -p 8080 -h $(HOST)/www -f"
+ 
+ runlua: hostenv
+-	build/hostenv.sh $(realpath host) $(LUA_MODULEDIR) $(LUA_LIBRARYDIR) "lua -i build/setup.lua"
++	build/hostenv.sh $(HOST) $(LUA_MODULEDIR) $(LUA_LIBRARYDIR) "lua -i build/setup.lua"
+ 
+ runshell: hostenv
+-	build/hostenv.sh $(realpath host) $(LUA_MODULEDIR) $(LUA_LIBRARYDIR) $$SHELL
++	build/hostenv.sh $(HOST) $(LUA_MODULEDIR) $(LUA_LIBRARYDIR) $$SHELL
+ 
+ hostclean: clean
+-	rm -rf host
++	rm -rf $(HOST)
+ 
+ apidocs: hostenv
+-	build/hostenv.sh $(realpath host) $(LUA_MODULEDIR) $(LUA_LIBRARYDIR) "build/makedocs.sh host/luci/ docs"
++	build/hostenv.sh $(HOST) $(LUA_MODULEDIR) $(LUA_LIBRARYDIR) "build/makedocs.sh $(HOST)/luci/ docs"
+ 
+ nixiodocs: hostenv
+-	build/hostenv.sh $(realpath host) $(LUA_MODULEDIR) $(LUA_LIBRARYDIR) "build/makedocs.sh libs/nixio/ nixiodocs"
++	build/hostenv.sh $(HOST) $(LUA_MODULEDIR) $(LUA_LIBRARYDIR) "build/makedocs.sh libs/nixio/ nixiodocs"
+ 
+ po: host
+ 	for L in $${LANGUAGE:-$$(find i18n/ -path 'i18n/*/luasrc/i18n/*' -name 'default.*.lua' | \
+ 	  sed -e 's!.*/default\.\(.*\)\.lua!\1!')}; do \
+-	    build/i18n-lua2po.pl . $(realpath host)/po $$L; \
++	    build/i18n-lua2po.pl . $(HOST)/po $$L; \
+ 	done
+ 
+ run:

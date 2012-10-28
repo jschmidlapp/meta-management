@@ -1,0 +1,38 @@
+--- collectd-5.1.0.orig/configure.in	2012-07-28 22:37:34.327293188 -0400
++++ collectd-5.1.0/configure.in	2012-07-28 22:38:02.671292351 -0400
+@@ -2,24 +2,19 @@
+ AC_INIT(collectd, [m4_esyscmd(./version-gen.sh)])
+ AC_CONFIG_SRCDIR(src/collectd.c)
+ AC_CONFIG_HEADERS(src/config.h)
+-AC_CONFIG_AUX_DIR([libltdl/config])
+ 
+ m4_ifdef([LT_PACKAGE_VERSION],
+ 	# libtool >= 2.2
+ 	[
+-	 LT_CONFIG_LTDL_DIR([libltdl])
+ 	 LT_INIT([dlopen])
+-	 LTDL_INIT([convenience])
+ 	 AC_DEFINE(LIBTOOL_VERSION, 2, [Define to used libtool version.])
+ 	]
+ ,
+ 	# libtool <= 1.5
+ 	[
+-	 AC_LIBLTDL_CONVENIENCE
+ 	 AC_SUBST(LTDLINCL)
+ 	 AC_SUBST(LIBLTDL)
+ 	 AC_LIBTOOL_DLOPEN
+-	 AC_CONFIG_SUBDIRS(libltdl)
+ 	 AC_DEFINE(LIBTOOL_VERSION, 1, [Define to used libtool version.])
+ 	]
+ )
+--- collectd-5.1.0.orig/Makefile.am	2012-07-28 22:43:41.167282350 -0400
++++ collectd-5.1.0/Makefile.am	2012-07-28 22:43:52.735282008 -0400
+@@ -1,6 +1,6 @@
+ ACLOCAL_AMFLAGS = -I libltdl/m4
+ 
+-SUBDIRS = libltdl src bindings
++SUBDIRS = src bindings
+ 
+ INCLUDES = $(LTDLINCL)
+ 
+

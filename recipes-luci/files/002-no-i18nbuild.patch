@@ -1,0 +1,11 @@
+--- git.orig/Makefile	2012-08-01 23:55:06.388824708 -0400
++++ git/Makefile	2012-08-01 23:55:16.732824397 -0400
+@@ -22,7 +22,7 @@
+ 		}; \
+ 	done
+ 
+-luabuild: i18nbuild
++luabuild: 
+ 	for i in $(MODULES); do HOST=$(realpath host) \
+ 		SDK="$(shell test -f .running-sdk && echo 1)" make -C$$i luabuild; done
+ 
